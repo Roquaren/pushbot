@@ -7,6 +7,7 @@
 #
 # Configuration:
 #
+# HUBOT_GEOCODING_APIKEY = Google Maps API key
 # HUBOT_WEATHER_APIKEY = forecast.io api key
 #
 
@@ -29,9 +30,9 @@ colors =
 
 tempToColor = (temp) ->
   if temp > MAX_TEMP
-    return colors[MAX_TEMP]
+    return colors[MAX_TEMP].toHexString()
   if temp < MIN_TEMP
-    return colors[MIN_TEMP]
+    return colors[MIN_TEMP].toHexString()
   lowBound = MIN_TEMP
   highBound = MAX_TEMP
   for checkTemp, checkColor of colors
@@ -60,11 +61,15 @@ module.exports = (robot) ->
 
   robot.respond /weather *(.+)/i, (msg) ->
     location = escape(msg.match[1])
-    url = "https://maps.googleapis.com/maps/api/geocode/json?address=#{location}"
+    mapsApiKey = process.env.HUBOT_GEOCODING_APIKEY
+    url = "https://maps.googleapis.com/maps/api/geocode/json?address=#{location}&key=#{mapsApiKey}"
     msg.http(url).get() (err, res, body) ->
       msg.send err if err
       try
         json = JSON.parse(body)
+        if json.status isnt "OK"
+          msg.send "Error geocoding location: `#{json.status}`"
+          return
         lat = json.results[0].geometry.location.lat
         lng = json.results[0].geometry.location.lng
         address = json.results[0].formatted_address

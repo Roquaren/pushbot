@@ -22,8 +22,12 @@ export HUBOT_MAPPING_DATAROOT=botdata/
 
 # weather
 
+export HUBOT_GEOCODING_APIKEY=
 export HUBOT_WEATHER_APIKEY=
 
 # lims
 
 export HUBOT_LISTS_ROOT=botdata/
+
+# debugging
+# export HUBOT_LOG_LEVEL=debug
